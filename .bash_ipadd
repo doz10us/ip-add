@@ -1,4 +1,4 @@
-if [[ $SSH_CONNECTION ]]; then
+if [ -n "$SSH_CONNECTION" ]; then
 	sship=$(echo $SSH_CONNECTION | awk -F " " '{ print $1 }')
 	cat .ip-add.conf | while read file
 	do
