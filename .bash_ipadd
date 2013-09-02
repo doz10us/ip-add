@@ -1,0 +1,7 @@
+if [[ $SSH_CONNECTION ]]; then
+	sship=$(echo $SSH_CONNECTION | awk -F " " '{ print $1 }')
+	result=$(grep -Fc "$sship" .htaccess)
+	if [[ $result = "0" ]]; then
+		echo "allow from "$sship >> .htaccess
+	fi
+fi
