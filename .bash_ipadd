@@ -1,10 +1,29 @@
+die() { printf %s "${@+$@$'\n'}" ; exit 1; }
+
 if [ -n "$SSH_CONNECTION" ]; then
-	sship=$(echo $SSH_CONNECTION | awk -F " " '{ print $1 }')
-	cat .ip-add.conf | while read file
-	do
-		result=$(grep -Fc "$sship" $file)
-		if [[ $result = "0" ]]; then
-			echo "allow from "$sship >> $file
-		fi
-	done
+        sship=$(echo $SSH_CONNECTION | awk -F " " '{ print $1 }')
+        if [ -f .ip-add.conf ]; then
+        	cat .ip-add.conf | while read file
+        	do
+        	        if [ -f $file ]; then
+	        	        if grep -Fq "$sship" $file; then
+    	    	                echo "allow from "$sship >> $file
+        		        fi
+        		    else
+        		    	die "$file not exists"
+        		    fi
+        	done
+        else
+        	die "Config file doesn't exist"
+        fi
 fi
+
+who | sed 's/.*(\(.*\))/\1/' | grep -e "[0-9]{1,3]\.[0-9]{1,3]\.[0-9]{1,3]\.[0-9]{1,3]" > .ip.remove
+cat $file | awk '{ print $3 }' | while read ip
+do
+	if [ -f .ip.remove ]; then
+		if ! grep -Fq "$ip" .ip.remove ; then
+			grep -Fqv "$ip" $file > /tmp/ip-add && mv /tmp/ip-add "$file"
+		fi
+	fi
+done
