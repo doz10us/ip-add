@@ -38,7 +38,7 @@ if [ -f .ip-add.conf ]; then
 			if [ -f .ip.remove ]; then
 				if ! grep -Fq "$ip" .ip.remove ; then
 					echo "Removing outdated lines..."
-					grep -Fqv "$ip" $file > /tmp/ip-add && mv /tmp/ip-add "$file"
+					sed -i "/$ip/d" "$file"
 				fi
 			fi
 			echo "We're OK now"
